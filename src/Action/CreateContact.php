@@ -43,12 +43,20 @@ class CreateContact
     {
         //get data from request
         $payload = $request->getContent();
+//
+//        var_dump($payload);
+//        exit;
+
         if(!$payload){
             return new Response(null, Response::HTTP_BAD_REQUEST); //todo - test
         }
 
         //convert to dto
-        $dto = $this->serializer->deserialize($payload, ContactDTO::class, 'json'); //TODO - test
+        try{
+            $dto = $this->serializer->deserialize($payload, ContactDTO::class, 'json');
+        }catch (Exception $e){
+            return new Response('Deserialization error', Response::HTTP_BAD_REQUEST);
+        }
 
         //validate dto
         /** @var ConstraintViolationList $errors */
@@ -58,9 +66,9 @@ class CreateContact
             $response = [];
             foreach ($errors->getIterator() as $error)
             {
-                $response[$error->getPropertyPath()] =$error->getMessage();
+                $response[$error->getPropertyPath()] = $error->getMessage();
             }
-            return new Response(json_encode($response)); //todo - move this to trait - test
+            return new Response(json_encode($response), Response::HTTP_BAD_REQUEST); //todo - move this to trait - test
         }
 
         //convert to entity
@@ -73,6 +81,6 @@ class CreateContact
             return new Response($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return new Response($this->serializer->serialize($entity, 'json'), Response::HTTP_OK);
+        return new Response($this->serializer->serialize($entity, 'json'), Response::HTTP_CREATED);
     }
 }
