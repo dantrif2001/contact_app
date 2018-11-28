@@ -1,3 +1,14 @@
 #index:
 #    path: /
 #    controller: App\Controller\DefaultController::index
+
+
+home:
+    path: /
+    controller: App\Action\Index
+    methods: [GET]
+
+create_receipt:
+    path: /api/contacts
+    controller: App\Action\CreateContact
+    methods: [POST]
